@@ -1,0 +1,224 @@
+clc;
+clear;
+% 速度更新参数
+c1 = 1.49445;
+c2 = 1.49445;
+% 最大迭代次数
+maxgen = 300;
+% 种群规模
+sizepop = 20;
+% 个体和速度最大最小值
+popmax = 2;
+popmin = -2;
+Vmax = 0.5;
+Vmin = -0.5;
+% 种群初始化
+pop = zeros(sizepop, 2); % 粒子位置
+V = zeros(sizepop, 2); % 粒子速度
+fitness = zeros(1, sizepop); % 粒子适应度值
+for i = 1:sizepop
+    % 随机产生一个种群
+    pop(i,:) = -2 + 4 * rand(1,2); % 初始化粒子位置
+    V(i,:) = -0.5 + rand(1,2); % 初始化速度
+    % 计算粒子适应度值
+    fitness(i) = fun(pop(i,:));
+end
+% 适应度函数（Griewank函数）
+function y = fun(x)
+    n = length(x);
+    sum_term = sum(x.^2) / 4000;  % 计算 x^2 / 4000
+    prod_term = prod(cos(x ./ sqrt(1:n)));  % 计算 cos(x_i / sqrt(i))
+    y = 1 + sum_term - prod_term;
+end
+% 寻找初始极值（寻找最小值）
+[bestfitness,bestindex] = min(fitness);
+zbest = pop(bestindex,:); % 全局最优位置
+gbest = pop; % 个体最优位置
+fitnessgbest = fitness; % 个体最优适应度
+fitnesszbest = bestfitness; % 全局最优适应度
+% 初始化三维网格用于绘图
+[x1, x2] = meshgrid(-5:0.1:5, -5:0.1:5);
+z = 0;
+for i = 1:size(x1,1)
+    for j = 1:size(x2,2)
+        z(i,j) = fun([x1(i,j), x2(i,j)]);
+    end
+end
+% 绘制初始的Griewank函数图形
+figure;
+surf(x1, x2, z);
+hold on;
+% 绘制粒子位置
+scatter3(pop(:,1), pop(:,2), fitness, 50, 'r', 'filled');
+% 设置图形标题和标签
+title('粒子群优化过程', 'fontsize', 12);
+xlabel('X1', 'fontsize', 12);
+ylabel('X2', 'fontsize', 12);
+zlabel('适应度值', 'fontsize', 12);
+% 迭代寻优
+result = zeros(1,maxgen); % 用于存储每代最优适应度值
+for i = 1:maxgen
+    % 每次清空之前的粒子位置
+    clf;
+    surf(x1, x2, z);
+    hold on;
+    % 粒子位置和速度更新
+    for j = 1:sizepop
+        % 速度更新
+        V(j,:) = V(j,:) + c1 * rand * (gbest(j,:) - pop(j,:)) + ...
+            c2 * rand * (zbest - pop(j,:));
+        V(j,find(V(j,:) > Vmax)) = Vmax;
+        V(j,find(V(j,:) < Vmin)) = Vmin;
+        % 粒子更新
+        pop(j,:) = pop(j,:) + 0.5 * V(j,:);
+        pop(j,find(pop(j,:) > popmax)) = popmax;
+        pop(j,find(pop(j,:) < popmin)) = popmin;
+        % 计算新粒子适应度值
+        fitness(j) = fun(pop(j,:));
+    end
+    % 个体极值和群体极值更新
+    for j = 1:sizepop
+        % 个体极值更新（寻找更小的值）
+        if fitness(j) < fitnessgbest(j)
+            gbest(j,:) = pop(j,:);
+            fitnessgbest(j) = fitness(j);
+        end
+        % 群体极值更新（寻找更小的值）
+        if fitness(j) < fitnesszbest
+            zbest = pop(j,:);
+            fitnesszbest = fitness(j);
+        end
+    end
+    
+    % 记录每代最优值
+    result(i) = fitnesszbest;
+    
+    % 更新粒子位置
+    scatter3(pop(:,1), pop(:,2), fitness, 50, 'r', 'filled');
+    drawnow;
+end
+% 结果分析
+% 绘制每代最优个体适应度值变化图形
+figure;
+plot(result);
+title('最优个体适应度值', 'fontsize', 12);
+xlabel('进化代数', 'fontsize', 12);
+ylabel('适应度值', 'fontsize', 12);
+% 输出最优解
+disp('最终找到的最小值位置：');
+disp(zbest);
+disp('对应的适应度值：');
+disp(fitnesszbest);
+2.Rosenbrock函数（香蕉函数）
+CLC;
+清楚;
+% 速度更新参数
+c1 = 1.49445;
+c2 = 1.49445;
+% 最大迭代次数
+最大生成 = 300;
+% 种群规模
+大小pop = 20;
+% 个体和速度最大最小值
+popmax = 2;
+流行 = -2;
+Vmax = 0.5;
+Vmin = -0.5;
+% 种群初始化
+pop = 零（sizepop， 2）;% 粒子位置
+V = 零（sizepop， 2）;% 粒子速度
+fitness = 零（1， sizepop）;% 粒子适应度值
+对于 i = 1：sizepop
+% 随机产生一个种群
+pop（i，:) = -2 + 4 * 兰德（1,2）;% 初始化粒子位置
+V（i，:) = -0.5 + 兰德（1,2）;% 初始化速度
+% 计算粒子适应度值
+fitness（i） = fun（pop（i，:));
+结束
+% 适应度函数（香蕉函数，包含求和）
+函数 y = fun（x）
+y = 0;
+n = 长度 （x）;
+    对于 i = 1：n-1
+y = y + 100*（x（i+1） - x（i）^2）^2 + （x（i） - 1）^2;
+结束
+结束
+% 寻找初始极值（寻找最小值）
+[最佳健身度，最佳指数] = min（健身度）;
+zbest = pop（最佳索引，:);% 全局最优位置
+gbest = 流行音乐;% 个体最优位置
+fitnessgbest = 健身;% 个体最优适应度
+fitnesszbest = 最佳健身;% 全局最优适应度
+% 初始化三维网格用于绘图
+[x1， x2] = meshGrid（-5：0.1：5， -5：0.1：5);
+z = 0;
+对于 i = 1：size（x1,1)
+    对于 j = 1：size（x2,2)
+z（i，j） = fun（[x1（i，j）， x2（i，j）]）;
+结束
+结束
+% 绘制初始的Rosenbrock函数图形
+数字;
+surf（x1， x2， z）;
+坚持;
+% 绘制粒子位置
+scatter3（pop（：，1）， pop（：，2）， fitness， 50， 'r'， 'filled');
+% 设置图形标题和标签
+title（'粒子群优化过程'， 'fontsize'， 12);
+xlabel（'X1'， '字体大小'， 12);
+ylabel（'X2'， '字体大小'， 12);
+zlabel（'适应度值'， '字体大小'， 12);
+% 迭代寻优
+结果 = 零（1，maxgen）;% 用于存储每代最优适应度值
+对于 i = 1：maxgen
+% 每次清空之前的粒子位置
+CLF;
+surf（x1， x2， z）;
+坚持;
+% 粒子位置和速度更新
+    对于 j = 1：sizePop
+% 速度更新
+V（j，:) = V（j，:) + c1 * rand * （gbest（j，:) - pop（j，:)） + ...
+c2 * 兰德 * （zbest - pop（j，:)）;
+V（j，find（V（j，:) > Vmax）） = Vmax;
+V（j，find（V（j，:) < Vmin）） = Vmin;
+% 粒子更新
+pop（j，:) = pop（j，:) + 0.5 * V（j，:);
+pop（j，find（pop（j，:) > popmax）） = popmax;
+pop（j，find（pop（j，:) < popmin）） = popmin;
+% 计算新粒子适应度值
+健身度（j） = fun（pop（j，:));
+结束
+% 个体极值和群体极值更新
+    对于 j = 1：sizePop
+% 个体极值更新（寻找更小的值）
+        如果 fitness（j） < fitnessgbest（j）
+gbest（j，:) = pop（j，:);
+fitnessgbest（j） = fitness（j）;
+        end
+        % 群体极值更新（寻找更小的值）
+        if fitness(j) < fitnesszbest
+            zbest = pop(j,:);
+            fitnesszbest = fitness(j);
+        end
+    end
+    
+    % 记录每代最优值
+    result(i) = fitnesszbest;
+    
+    % 更新粒子位置
+    scatter3(pop(:,1), pop(:,2), fitness, 50, 'r', 'filled');
+    drawnow;
+end
+% 结果分析
+% 绘制每代最优个体适应度值变化图形
+figure;
+plot(result);
+title('最优个体适应度值', 'fontsize', 12);
+xlabel('进化代数', 'fontsize', 12);
+ylabel('适应度值', 'fontsize', 12);
+% 输出最优解
+disp('最终找到的最小值位置：');
+disp(zbest);
+disp('对应的适应度值：');
+disp(fitnesszbest);
